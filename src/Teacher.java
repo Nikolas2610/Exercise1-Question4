@@ -1,97 +1,92 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Teacher extends Thread {
     private ArrayList<Student> studentsList = new ArrayList<>();
     private String name;
-    private int id;
+    private static final DecimalFormat df = new DecimalFormat("0.0");   // Decimal Format
 
-    private int nextAssignment = 0;
-
-    public ArrayList<Student> getStudentsList() {
-        return studentsList;
+//    Constructor
+    public Teacher(String name) {
+        this.name = name;
     }
 
-    private boolean waiting = true;
-
-    public void setAssignment(int assignment) {
-        this.nextAssignment = assignment;
-        process = true;
-    }
-
+//    Get teacher name
     public String getTeacherName() {
         return name;
     }
 
-    public int getTeacherId() {
-        return id;
-    }
-
-    private boolean process = true;
-
-    public Teacher(String name, int id) {
-        this.name = name;
-        this.id = id;
-    }
-
+//    Thread function
     @Override
     public void run() {
-        addGradeToAssignment(nextAssignment);
-    }
-
-    public void createClassWithStudents(int sizeOfStudents, String[] randomNames) {
-        for (int i = 0; i < sizeOfStudents; i++) {
-            studentsList.add(new Student(randomNames[randomNumber(0, randomNames.length)], i));
+//        Run the thread of their student
+        for (Student student : studentsList) {
+            student.start();
+        }
+//      Wait students to finish
+        for (Student student : studentsList) {
+            try {
+                student.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
+//    Create class and add the students | Relation: One to Many
+    public void createClassWithStudents(int sizeOfStudents) {
+        for (int i = 0; i < sizeOfStudents; i++) {
+            studentsList.add(new Student("S" + i + " (" + this.getTeacherName() + ")", this));
+        }
+    }
+
+//    Print students per class
     public void printStudents() {
         System.out.println("=======================================");
-        System.out.println("ID: " + getTeacherId() + " | Teacher: " + getTeacherName() + "\n");
-        System.out.println("Students list: ");
+        System.out.println("-------------Teacher " + getTeacherName() + "--------------");
         for (Student s : studentsList) {
             s.printStudent();
         }
-        System.out.println("=======================================");
+        System.out.println("=======================================\n");
     }
 
-    public void addAssignment(int assignmentNumber) throws InterruptedException {
-        System.out.println("Assignment: " + assignmentNumber);
-        if (nextAssignment == 1) {
-            for (Student student : studentsList) {
-                student.setNextAssignment(assignmentNumber);
-                student.start();
-            }
-//            for (Student student : studentsList) {
-//                student.join();
-//            }
-        } else {
-            for (Student student : studentsList) {
-                student.setNextAssignment(assignmentNumber);
-                student.avtiveStudent();
-            }
+//    Teacher Thread add grade to the assignment of his student
+    public synchronized void addGradeToAssignment(int assignmentNumber, Student student) {
+        //        Get exists assignment
+        student.getStudentAssignment(assignmentNumber).correctionAssignment();
+        int randomNum = randomNumber();// Get random number to wait
+        //        Thread is sleeping
+        try {
+            Thread.sleep(randomNum);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        System.out.println("continue join");
+        //        Print action
+        System.out.println("\tCorrection Assignment | Teacher " + getTeacherName() + " add grade to student: " + student.getStudentName() + " for assignment: "
+                + student.getStudentAssignment(assignmentNumber).getId() + ". Grade:" + df.format(student.getStudentAssignment(assignmentNumber).getGrade()) + " | Time: " + randomNum);
     }
 
-    public void addGradeToAssignment(int assignmentNumber) {
-        for (Student student : studentsList) {
-            student.getStudentAssignment(assignmentNumber).correctionAssignment();
-            int randomNum = randomNumber(2000, 5000);
-            try {
-                Thread.sleep(randomNum);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println(getName() + " | Teacher " + getTeacherId() + " add grade to student: " + student.getStudentId() + " for assignment: " + student.getStudentAssignment(assignmentNumber).getId() + " . Time:" + randomNum);
+//    Teacher Thread add grade to the exam of his student
+    public synchronized void addGradeToExam(int examNumber, Student student) {
+//        Get exists exam
+        student.getStudentExam(examNumber).correctionExam();
+        int randomNum = randomNumber(); // Get random number to wait
+//        Thread is sleeping
+        try {
+            Thread.sleep(randomNum);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-//        System.out.println(getName() + " | Teacher " + getTeacherId() + " finish add grades for " + (assignmentNumber) + " assignment");
-
+//        Print action
+        System.out.println("\t\t\tCorrection Exam | Teacher " + getTeacherName() + " add grade to student: " + student.getStudentName() + " for exam: " + student.getStudentExam(examNumber).getId()
+                + ". Grade:" + df.format(student.getStudentExam(examNumber).getGrade()) + " | Time: " + randomNum);
     }
-
 
     //    Create random number function with min and max value
-    private static int randomNumber(int min, int max) {
+    private static int randomNumber() {
+        int min = 1000;
+        int max = 3000;
         Random random = new Random();
         return random.nextInt(max - min) + (min);
     }

@@ -1,83 +1,56 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-import static java.lang.System.exit;
-
 public class Main {
 
-    private static String[] randomNames =  new String[] { "Adam", "Alex", "Aaron", "Ben", "Carl", "Dan", "David", "Edward", "Fred",
-            "Frank", "George", "Hal", "Hank", "Ike", "John", "Jack", "Joe", "Larry", "Monte", "Matthew",
-            "Mark", "Nathan", "Otto", "Paul", "Peter", "Roger", "Roger", "Steve", "Thomas", "Tim", "Ty", "Victor", "Walter"};
-
     public static void main(String[] args) throws InterruptedException {
-
+//        Create Teacher List
         ArrayList<Teacher> teacherList = new ArrayList<>();
 
 //        Exercise
-        int numberOfStudents = 6;
-        int numberOfTeachers = 2;
-        int batch = numberOfStudents / numberOfTeachers;
-
-//        Create Teacher
+        int numberOfStudents = randomNumber(4, 200);     // Random number for students
+        int numberOfTeachers = randomNumber(1, (numberOfStudents / 2) );   //Random number for teachers smaller from the students number
+//        numberOfStudents = 120;    // for standard value
+//        numberOfTeachers = 60;    // for standard value
+        int classCount = numberOfTeachers;
+        System.out.println("Teachers: " + numberOfTeachers + " , Students: " + numberOfStudents);
+        System.out.println("+++++++++++++++++++++++++++++++++++++\n");
+//        Create Teachers
         for (int i = 0; i < numberOfTeachers; i++) {
-            teacherList.add(new Teacher(randomNames[randomNumber(0, randomNames.length)], i));
+            teacherList.add(new Teacher(("T" + i+1)));
         }
 
-//        Create Students
-        for (int i = 0; i < numberOfTeachers; i++) {
-            teacherList.get(i).createClassWithStudents(batch, randomNames);
-//            teacherList.get(i).printStudents();
+//        Create Student class and add students
+        for (int i = 0; i < classCount; i++) {
+//            Get upper round number of the division
+            int size = (int) Math.ceil((double) numberOfStudents / numberOfTeachers);
+            teacherList.get(i).createClassWithStudents(size);
+            numberOfStudents -= size;   // Remove the added students
+            numberOfTeachers--; //Decrease count for the new division
+
+        }
+//        Get start time of  the app
+        long start = System.currentTimeMillis();
+//        Start the threads for the teachers
+        for (Teacher t : teacherList) {
+            t.start();
+        }
+//      Wait the App to finish
+        for (Teacher t : teacherList) {
+            t.join();
+        }
+//        Get the end time of the app
+        long end = System.currentTimeMillis();
+        System.out.println("\n\n--------FINAL----------");
+//      Print the students with their grades
+        for (Teacher t : teacherList) {
+            t.printStudents();
         }
 
-//        Question4 q4 = new Question4(teacherList);
-
-//        for (Teacher t: teacherList) {
-//            t.start();
-//        }
-//
-//        for (Teacher t: teacherList) {
-//            t.join();
-//        }
-
-//        Print
-//        for (int i = 0; i < numberOfTeachers; i++) {
-//            teacherList.get(i).printStudents();
-//        }
-
-
-
-        final ProcessThread procesor = new ProcessThread();
-
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    procesor.students(teacherList);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    procesor.teachers(teacherList);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        t1.start();
-        t2.start();
-
-        t1.join();
-        t2.join();
-
-
-
+//        Print the duration of the app
+        System.out.println("--------DURATION OF APP----------");
+        System.out.println("Duration is " + (end - start) + "msec");
+        System.out.println("---------------------------------");
     }
 
     //    Create random number function with min and max value
