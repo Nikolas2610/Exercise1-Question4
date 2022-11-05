@@ -6,6 +6,19 @@ public class Teacher extends Thread {
     private String name;
     private int id;
 
+    private int nextAssignment = 0;
+
+    public ArrayList<Student> getStudentsList() {
+        return studentsList;
+    }
+
+    private boolean waiting = true;
+
+    public void setAssignment(int assignment) {
+        this.nextAssignment = assignment;
+        process = true;
+    }
+
     public String getTeacherName() {
         return name;
     }
@@ -14,6 +27,8 @@ public class Teacher extends Thread {
         return id;
     }
 
+    private boolean process = true;
+
     public Teacher(String name, int id) {
         this.name = name;
         this.id = id;
@@ -21,25 +36,7 @@ public class Teacher extends Thread {
 
     @Override
     public void run() {
-        for (int i = 1; i < 3; i++) {
-            System.out.println("Again: " + i);
-            try {
-                addAssignment(i);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            addGradeToAssignment(i);
-            synchronized (this) {
-                try {
-                    wait();
-                    System.out.println("Continue");
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.println("Continue2");
-        }
-
+        addGradeToAssignment(nextAssignment);
     }
 
     public void createClassWithStudents(int sizeOfStudents, String[] randomNames) {
@@ -58,33 +55,37 @@ public class Teacher extends Thread {
         System.out.println("=======================================");
     }
 
-    private void addAssignment(int assignmentNumber) throws InterruptedException {
+    public void addAssignment(int assignmentNumber) throws InterruptedException {
         System.out.println("Assignment: " + assignmentNumber);
-        for (Student student : studentsList) {
-            student.setNextAssignment(assignmentNumber);
-            student.start();
+        if (nextAssignment == 1) {
+            for (Student student : studentsList) {
+                student.setNextAssignment(assignmentNumber);
+                student.start();
+            }
+//            for (Student student : studentsList) {
+//                student.join();
+//            }
+        } else {
+            for (Student student : studentsList) {
+                student.setNextAssignment(assignmentNumber);
+                student.avtiveStudent();
+            }
         }
-        for (Student student : studentsList) {
-            student.join();
-        }
-
+        System.out.println("continue join");
     }
 
-    private void addGradeToAssignment(int assignmentNumber) {
-        System.out.println("Correction Assignments");
+    public void addGradeToAssignment(int assignmentNumber) {
         for (Student student : studentsList) {
             student.getStudentAssignment(assignmentNumber).correctionAssignment();
+            int randomNum = randomNumber(2000, 5000);
             try {
-                Thread.sleep(randomNumber(2000, 5000));
+                Thread.sleep(randomNum);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println(getName() + " | Teacher " + getTeacherId() + " add grade to student: " + student.getStudentId());
+            System.out.println(getName() + " | Teacher " + getTeacherId() + " add grade to student: " + student.getStudentId() + " for assignment: " + student.getStudentAssignment(assignmentNumber).getId() + " . Time:" + randomNum);
         }
-        synchronized (this) {
-            System.out.println(getName() + " | Teacher " + getTeacherId() + " finish add grades for " + assignmentNumber + " assignment");
-            notify();
-        }
+//        System.out.println(getName() + " | Teacher " + getTeacherId() + " finish add grades for " + (assignmentNumber) + " assignment");
 
     }
 
