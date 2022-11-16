@@ -68,7 +68,8 @@ public class Student extends Thread {
             e.printStackTrace();
         }
 //        Print action
-        System.out.println("Assignment | Student " + getStudentName() + " has finish assignment: " + assignmentList.get(number).getId() + ". Time: " + randomNum);
+        System.out.println("Assignment | Student " + getStudentName() + " has finish assignment: "
+                + assignmentList.get(number).getId() + ". Time: " + randomNum);
 //        Call the Teacher to add grade to his assignment
         teacher.addGradeToAssignment(number, this);
     }

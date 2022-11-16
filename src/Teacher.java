@@ -63,8 +63,11 @@ public class Teacher extends Thread {
             e.printStackTrace();
         }
         //        Print action
-        System.out.println("\tCorrection Assignment | Teacher " + getTeacherName() + " add grade to student: " + student.getStudentName() + " for assignment: "
-                + student.getStudentAssignment(assignmentNumber).getId() + ". Grade:" + df.format(student.getStudentAssignment(assignmentNumber).getGrade()) + " | Time: " + randomNum);
+        System.out.println("\tCorrection Assignment | Teacher " + getTeacherName()
+                + " add grade to student: " + student.getStudentName() + " for assignment: "
+                + student.getStudentAssignment(assignmentNumber).getId()
+                + ". Grade:" + df.format(student.getStudentAssignment(assignmentNumber).getGrade())
+                + " | Time: " + randomNum);
     }
 
 //    Teacher Thread add grade to the exam of his student
