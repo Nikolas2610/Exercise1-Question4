@@ -10,8 +10,7 @@ public class Main {
 //        Exercise
         int numberOfStudents = randomNumber(4, 200);     // Random number for students
         int numberOfTeachers = randomNumber(1, (numberOfStudents / 2) );   //Random number for teachers smaller from the students number
-//        numberOfStudents = 120;    // for standard value
-//        numberOfTeachers = 60;    // for standard value
+
         int classCount = numberOfTeachers;
         System.out.println("Teachers: " + numberOfTeachers + " , Students: " + numberOfStudents);
         System.out.println("+++++++++++++++++++++++++++++++++++++\n");

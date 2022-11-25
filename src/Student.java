@@ -121,8 +121,8 @@ public class Student extends Thread {
 
 //    Get random number
     private int randomNumber() {
-        int min = 1000;
-        int max = 3000;
+        int min = 3000;
+        int max = 5000;
         Random random = new Random();
         return random.nextInt(max - min) + (min);
     }
